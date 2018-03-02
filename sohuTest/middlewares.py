@@ -11,6 +11,8 @@ import time
 from  scrapy.log import logger
 from selenium.webdriver.support.ui import WebDriverWait
 from scrapy.http import HtmlResponse
+import win_unicode_console
+win_unicode_console.enable()
 driver = webdriver.PhantomJS(service_args=['--disk-cache=true','--load-images=false']) #设置缓存和禁止图片加载
 wait = WebDriverWait(driver,1) #等待1秒浏览器进行加载
 driver.set_window_size(100,1200)
@@ -62,31 +64,45 @@ class SohutestSpiderMiddleware(object):
     def process_request(self,request,spider):
         try:
             if request.url.startswith("http://www.sohu.com"):
-                driver.get(request.url)
-                #chrome浏览器提速
-                # chrome_opt = webdriver.ChromeOptions()
-                # prefs = {"profile.managed_default_content_settings.images": 2}
-                # chrome_opt.add_experimental_option("prefs", prefs)
-                # #driver = webdriver.Chrome(service_args=['--disk-cache=true','--load-images=false'])
-                # driver = webdriver.Chrome( chrome_options=chrome_opt)
-                # driver.set_window_size(100, 1000)
-                # driver.get(request.url)
-                # js = "document.documentElement.scrollTop=document.documentElement.scrollHeight"  # 滚动条下拉1000px
-                # end = driver.find_elements_by_xpath("//div[@class='more-load' and @style='']")
-                # count = 1
-                # while not len(end):
-                #     print(count)
-                #     driver.execute_script(js)
-                #     time.sleep(1)
-                #     end = driver.find_elements_by_xpath("//div[@class='more-load' and @style='']")
-                #     count += 1
-                count = 1
-                while count<50:
-                    driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-                    count +=1
-                    logger.info('正在加载')
-                    time.sleep(0.5)
-                content = driver.page_source.encode('utf-8')
-                return HtmlResponse(request.url,body=content)
+                if request.url.endswith('depth=1'):
+                    try:
+                        driver.get(request.url.rstrip('depth=1'))
+                    except:
+                        logger.info('出现异常1')
+                    #chrome浏览器提速
+                    # chrome_opt = webdriver.ChromeOptions()
+                    # prefs = {"profile.managed_default_content_settings.images": 2}
+                    # chrome_opt.add_experimental_option("prefs", prefs)
+                    # #driver = webdriver.Chrome(service_args=['--disk-cache=true','--load-images=false'])
+                    # driver = webdriver.Chrome( chrome_options=chrome_opt)
+                    # driver.set_window_size(100, 1000)
+                    # driver.get(request.url)
+                    # js = "document.documentElement.scrollTop=document.documentElement.scrollHeight"  # 滚动条下拉1000px
+                    # end = driver.find_elements_by_xpath("//div[@class='more-load' and @style='']")
+                    # count = 1
+                    # while not len(end):
+                    #     print(count)
+                    #     driver.execute_script(js)
+                    #     time.sleep(1)
+                    #     end = driver.find_elements_by_xpath("//div[@class='more-load' and @style='']")
+                    #     count += 1
+                    count = 1
+                    while count<50:
+                        driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+                        count +=1
+                        logger.info('正在加载')
+                        time.sleep(0.5)
+                    content = driver.page_source.encode('utf-8')
+                    driver.close()
+                    return HtmlResponse(request.url,body=content)
+                else:
+                    try:
+                        driver.get(request.url.rstrip('depth=2'))
+                    except:
+                        logger.info('出现异常2')
+                    content = driver.page_source.encode('utf-8')
+                    driver.close()
+                    return HtmlResponse(request.url, body=content)
+
         except:
             logger.info('出现异常')

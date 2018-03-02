@@ -13,6 +13,5 @@ class SohutestItem(scrapy.Item):
     title = scrapy.Field()
     time = scrapy.Field()
     source = scrapy.Field()
-    editor = scrapy.Field()
     read_nums = scrapy.Field()
     url = scrapy.Field()
