@@ -86,14 +86,13 @@ class SohutestSpiderMiddleware(object):
                     #     time.sleep(1)
                     #     end = driver.find_elements_by_xpath("//div[@class='more-load' and @style='']")
                     #     count += 1
-                    count = 1
+                    count = 0
                     while count<50:
                         driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
                         count +=1
                         logger.info('正在加载')
                         time.sleep(0.5)
                     content = driver.page_source.encode('utf-8')
-                    driver.close()
                     return HtmlResponse(request.url,body=content)
                 else:
                     try:
@@ -101,7 +100,6 @@ class SohutestSpiderMiddleware(object):
                     except:
                         logger.info('出现异常2')
                     content = driver.page_source.encode('utf-8')
-                    driver.close()
                     return HtmlResponse(request.url, body=content)
 
         except:
