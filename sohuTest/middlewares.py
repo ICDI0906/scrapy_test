@@ -13,9 +13,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 from scrapy.http import HtmlResponse
 import win_unicode_console
 win_unicode_console.enable()
-driver = webdriver.PhantomJS(service_args=['--disk-cache=true','--load-images=false']) #设置缓存和禁止图片加载
-wait = WebDriverWait(driver,1) #等待1秒浏览器进行加载
-driver.set_window_size(100,1200)
+# driver = webdriver.PhantomJS(service_args=['--disk-cache=true','--load-images=false']) #设置缓存和禁止图片加载
+# wait = WebDriverWait(driver,1) #等待1秒浏览器进行加载
+# driver.set_window_size(100,1200)
+
 class SohutestSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -63,9 +64,13 @@ class SohutestSpiderMiddleware(object):
 
     def process_request(self,request,spider):
         try:
+            driver = webdriver.PhantomJS(service_args=['--disk-cache=true', '--load-images=false'])  # 设置缓存和禁止图片加载
+            wait = WebDriverWait(driver, 1)  # 等待1秒浏览器进行加载
+            driver.set_window_size(100, 1200)
             if request.url.startswith("http://www.sohu.com"):
                 if request.url.endswith('depth=1'):
                     try:
+                        time.sleep(0.5)
                         driver.get(request.url.rstrip('depth=1'))
                     except:
                         logger.info('出现异常1')
@@ -93,13 +98,16 @@ class SohutestSpiderMiddleware(object):
                         logger.info('正在加载')
                         time.sleep(0.5)
                     content = driver.page_source.encode('utf-8')
+                    driver.close()
                     return HtmlResponse(request.url,body=content)
                 else:
                     try:
+                        time.sleep(0.5)
                         driver.get(request.url.rstrip('depth=2'))
                     except:
                         logger.info('出现异常2')
                     content = driver.page_source.encode('utf-8')
+                    driver.close()
                     return HtmlResponse(request.url, body=content)
 
         except:

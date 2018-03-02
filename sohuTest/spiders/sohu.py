@@ -3,6 +3,17 @@ import scrapy
 from sohuTest.items import SohutestItem
 import win_unicode_console
 win_unicode_console.enable()
+headers = {
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+  'Accept-Encoding':	'gzip, deflate',
+  'Accept-Language	':'en-US,en;q=0.5',
+  'Cache-Control':'max-age=0',
+  'Connection'	:'keep-alive',
+  'Upgrade-Insecure-Requests':'1',
+'Host':'www.sohu.com',
+'Referer:':'http://news.sohu.com/',
+  'User-Agent':'Mozilla/5.0 (Windows NT 10.0; …) Gecko/20100101 Firefox/59.0'
+}
 class SohuSpider(scrapy.Spider):
     name = 'sohu'
     allowed_domains = ['sohu.com']
@@ -18,7 +29,7 @@ class SohuSpider(scrapy.Spider):
             # self.file.write(link+'\n')
             # self.file.flush()
             # print('##########################################################', link)
-            yield scrapy.Request(link+'depth=1', callback = self.detailPage)
+            yield scrapy.Request(link+'depth=1',headers=headers, callback = self.detailPage)
     def detailPage(self,response):
         item = SohutestItem()
         title = response.xpath("//div[@class='text-title']/h1/text()").extract()
@@ -58,4 +69,4 @@ class SohuSpider(scrapy.Spider):
             # self.file.write(link + '\n')
             # self.file.flush()
             # print('##########################################################',link)
-            yield scrapy.Request(link+'depth=2',callback=self.detailPage)
+            yield scrapy.Request(link+'depth=2',headers=headers,callback=self.detailPage)

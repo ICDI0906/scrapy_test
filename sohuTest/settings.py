@@ -39,10 +39,16 @@ CONCURRENT_REQUESTS = 100
 #TELNETCONSOLE_ENABLED = Falses
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
+# DEFAULT_REQUEST_HEADERS = {
 #   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #   'Accept-Language': 'en',
-#}
+#   'Accept-Encoding':	'gzip, deflate',
+#   'Accept-Language	':'en-US,en;q=0.5',
+#   'Cache-Control':'max-age=0',
+#   'Connection'	:'keep-alive',
+#   'Upgrade-Insecure-Requests':'1',
+#   'User-Agent':'Mozilla/5.0 (Windows NT 10.0; …) Gecko/20100101 Firefox/59.0'
+# }
 
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
