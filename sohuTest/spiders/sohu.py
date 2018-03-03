@@ -19,7 +19,31 @@ class SohuSpider(scrapy.Spider):
     allowed_domains = ['sohu.com']
     start_urls = ['http://news.sohu.com/']
     # file = open('link.txt','w',encoding='utf-8')
-    def call_request(self,res):
+    def parse(self, response):
+        #时政新闻
+        res = response.xpath("//div[@class='content-politics-society area public clearfix']//a/@href").extract()
+        other = response.xpath("//div[@class='contentA public area clearfix']//a/@href").extract()
+        res.extend(other)
+        other = response.xpath("//div[@class='content-military-culture area public clearfix']//a/@href").extract()
+        res.extend(other)
+        #财经金融
+        other = response.xpath("//div[@class='content-business-finance area public clearfix']//a/@href").extract()
+        res.extend(other)
+        #娱乐新闻
+        other = response.xpath("//div[@class='content-sports-yule area public clearfix']//a/@href").extract()
+        res.extend(other)
+        #时尚生活
+        other = response.xpath(
+            "//div[@class='content-fashion-life area public clearfix']//a/@href").extract()
+        res.extend(other)
+        #房产汽车
+        other = response.xpath(
+            "//div[@class='content-focus-auto area public clearfix']//a/@href").extract()
+        res.extend(other)
+        #数码科技
+        other = response.xpath(
+            "//div[@class='content-it-digital area public clearfix']//a/@href").extract()
+        res.extend(other)
         for link in res:
             if not link.startswith('http:'):  #有些链接是没有http的
                 link = 'http:'+link
@@ -29,33 +53,6 @@ class SohuSpider(scrapy.Spider):
             # self.file.flush()
             # print('##########################################################', link)
             yield scrapy.Request(link+'depth=1',headers=headers, callback = self.detailPage)
-    def parse(self, response):
-        #时政新闻
-        res = response.xpath("//div[@class='content-politics-society area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        res = response.xpath("//div[@class='//div[@class='contentA public area clearfix']//a/@href").extract()
-        self.call_request(res)
-        #军事文化
-        res = response.xpath("//div[@class='//div[@class='content-military-culture area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        #财经金融
-        res = response.xpath("//div[@class='//div[@class='content-business-finance area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        #娱乐新闻
-        res = response.xpath("//div[@class='//div[@class='content-sports-yule area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        #时尚生活
-        res = response.xpath(
-            "//div[@class='//div[@class='content-fashion-life area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        #房产汽车
-        res = response.xpath(
-            "//div[@class='//div[@class='content-focus-auto area public clearfix']//a/@href").extract()
-        self.call_request(res)
-        #数码科技
-        res = response.xpath(
-            "//div[@class='//div[@class='content-it-digital area public clearfix']//a/@href").extract()
-        self.call_request(res)
     def detailPage(self,response):
         depth = response.url.split('=')[len(response.url.split('='))-1]
         item = SohutestItem()
