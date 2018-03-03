@@ -19,8 +19,7 @@ class SohuSpider(scrapy.Spider):
     allowed_domains = ['sohu.com']
     start_urls = ['http://news.sohu.com/']
     # file = open('link.txt','w',encoding='utf-8')
-    def parse(self, response):
-        res = response.xpath("//div[@class='content-politics-society area public clearfix']//a/@href").extract()
+    def call_request(self,res):
         for link in res:
             if not link.startswith('http:'):  #有些链接是没有http的
                 link = 'http:'+link
@@ -30,7 +29,35 @@ class SohuSpider(scrapy.Spider):
             # self.file.flush()
             # print('##########################################################', link)
             yield scrapy.Request(link+'depth=1',headers=headers, callback = self.detailPage)
+    def parse(self, response):
+        #时政新闻
+        res = response.xpath("//div[@class='content-politics-society area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        res = response.xpath("//div[@class='//div[@class='contentA public area clearfix']//a/@href").extract()
+        self.call_request(res)
+        #军事文化
+        res = response.xpath("//div[@class='//div[@class='content-military-culture area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        #财经金融
+        res = response.xpath("//div[@class='//div[@class='content-business-finance area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        #娱乐新闻
+        res = response.xpath("//div[@class='//div[@class='content-sports-yule area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        #时尚生活
+        res = response.xpath(
+            "//div[@class='//div[@class='content-fashion-life area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        #房产汽车
+        res = response.xpath(
+            "//div[@class='//div[@class='content-focus-auto area public clearfix']//a/@href").extract()
+        self.call_request(res)
+        #数码科技
+        res = response.xpath(
+            "//div[@class='//div[@class='content-it-digital area public clearfix']//a/@href").extract()
+        self.call_request(res)
     def detailPage(self,response):
+        depth = response.url.split('=')[len(response.url.split('='))-1]
         item = SohutestItem()
         title = response.xpath("//div[@class='text-title']/h1/text()").extract()
         if not len(title):
@@ -57,8 +84,15 @@ class SohuSpider(scrapy.Spider):
             return
         item ['title'] = title;item['time'] = time; item['source']=source;item['read_nums']=read_nums
         # print(title,'---->',time,'------>',source,'----->',editor)
+        url = response.url
+        url = url.split('?')
+        if len(url)>1:
+            url = url[0]
+        else:
+            url = url[0].split('depth')[0]
+        item['url'] = url
         yield item
-        if response.url.endswith('depth=2'):
+        if depth == '3': #深度为三的时候返回
             return
         links = response.xpath("//div[@data-role='news-item']/h4/a/@href").extract()
         for link in links:
@@ -69,4 +103,4 @@ class SohuSpider(scrapy.Spider):
             # self.file.write(link + '\n')
             # self.file.flush()
             # print('##########################################################',link)
-            yield scrapy.Request(link+'depth=2',headers=headers,callback=self.detailPage)
+            yield scrapy.Request(link+'depth='+str(int(depth)+1),headers=headers,callback=self.detailPage)

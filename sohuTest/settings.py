@@ -96,7 +96,7 @@ ITEM_PIPELINES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 #REDIS_URL = 'redis://sxw@192.168.75.50:6379'
-#SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-#DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-#REDIS_HOST = '192.168.100.134'
-#REDIS_PORT = 6379
+SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+REDIS_HOST = '118.25.13.14'
+REDIS_PORT = 6379

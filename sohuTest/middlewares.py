@@ -68,12 +68,15 @@ class SohutestSpiderMiddleware(object):
             wait = WebDriverWait(driver, 1)  # 等待1秒浏览器进行加载
             driver.set_window_size(100, 1200)
             if request.url.startswith("http://www.sohu.com"):
-                if request.url.endswith('depth=1'):
+                other = request.url.split('depth')
+                depth= int(other[1].split('=')[1])
+                url = other[0]
+                if depth == 1 or depth ==2 :
                     try:
-                        time.sleep(0.5)
-                        driver.get(request.url.rstrip('depth=1'))
+                        time.sleep(1)
+                        driver.get(url)
                     except:
-                        logger.info('出现异常1')
+                        logger.info('出现异常1,2')
                     #chrome浏览器提速
                     # chrome_opt = webdriver.ChromeOptions()
                     # prefs = {"profile.managed_default_content_settings.images": 2}
@@ -102,10 +105,10 @@ class SohutestSpiderMiddleware(object):
                     return HtmlResponse(request.url,body=content)
                 else:
                     try:
-                        time.sleep(0.5)
-                        driver.get(request.url.rstrip('depth=2'))
+                        time.sleep(1)
+                        driver.get(url)
                     except:
-                        logger.info('出现异常2')
+                        logger.info('出现异常3')
                     content = driver.page_source.encode('utf-8')
                     driver.close()
                     return HtmlResponse(request.url, body=content)
