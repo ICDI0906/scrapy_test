@@ -30,8 +30,11 @@ CONCURRENT_REQUESTS = 100
 #DOWNLOAD_DELAY = 3
 # The download delay setting will honor only one of:
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
-#CONCURRENT_REQUESTS_PER_IP = 16
-
+#CONCURRENT_REQUESTS_PER_IP = 16 #对单个ip 请求的最大值
+#CONCURRENT_REQUESTS = 16  #指Scrapy Downloader ,并发请求的最大值
+#DEPTH_LIMIT = 0 深度限制
+#DEPTH_PRIORITY=0 #整数值，用于调整requests的优先级，如果为0，则不根据深度调整优先级
+#DNSCACHE_ENABLED = True 指是否启用DNS内存缓存
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
 
@@ -96,7 +99,7 @@ ITEM_PIPELINES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 #REDIS_URL = 'redis://sxw@192.168.75.50:6379'
-SCHEDULER = "scrapy_redis.scheduler.Scheduler"
-DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
-REDIS_HOST = '118.25.13.14'
-REDIS_PORT = 6379
+# SCHEDULER = "scrapy_redis.scheduler.Scheduler"
+# DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
+# REDIS_HOST = '118.25.13.14'
+# REDIS_PORT = 6379

@@ -2,6 +2,8 @@
 import scrapy
 from sohuTest.items import SohutestItem
 import win_unicode_console
+import time
+import requests
 win_unicode_console.enable()
 headers = {
   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -47,7 +49,7 @@ class SohuSpider(scrapy.Spider):
         for link in res:
             if not link.startswith('http:'):  #有些链接是没有http的
                 link = 'http:'+link
-            if len(link.split('/'))>3 and link.split('/')[3] != 'a':      #把不是详情页的给去掉
+            if (len(link.split('/'))>3  and link.split('/')[3] != 'a') or len(link.split('/'))<=3:      #把不是详情页的给去掉
                 continue
             # self.file.write(link+'\n')
             # self.file.flush()
@@ -61,11 +63,11 @@ class SohuSpider(scrapy.Spider):
             title =''
         else:
             title = title[0]
-        time = response.xpath("//div[@class='article-info']/span[@class='time']/text()").extract()
-        if not len(time):
-            time = ''
+        tim = response.xpath("//div[@class='article-info']/span[@class='time']/text()").extract()
+        if not len(tim):
+            tim = ''
         else:
-            time = time[0]
+            tim = tim[0]
         source = response.xpath("//div[@class='article-info']/span/a/text()").extract()
         if  not len(source):
             source = ''
@@ -77,9 +79,13 @@ class SohuSpider(scrapy.Spider):
             read_nums = 0
         else:
             read_nums = read_nums[0]
-        if title =='' and time =='' and source =='' and editor == '':
+        if title =='' and tim =='' and source =='' and editor == '':
             return
-        item ['title'] = title;item['time'] = time; item['source']=source;item['read_nums']=read_nums
+        item ['title'] = title;item['time'] = tim; item['source']=source
+        item['history'] = [{
+            'time':time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), #记录一下时间
+            'num':read_nums
+        }]
         # print(title,'---->',time,'------>',source,'----->',editor)
         url = response.url
         url = url.split('?')
@@ -88,6 +94,13 @@ class SohuSpider(scrapy.Spider):
         else:
             url = url[0].split('depth')[0]
         item['url'] = url
+        #新增加的
+        res = requests.get('http://apiv2.sohu.com/api/comment/list?page_size=100000&source_id=mp_' +
+                           item['url'].split('/')[4].split('_')[0]).json()
+        if res['code'] == 200:
+            item['comments'] = res['jsonObject']
+        else:
+            item['comments'] = {}
         yield item
         if depth == '3': #深度为三的时候返回
             return
